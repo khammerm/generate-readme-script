@@ -5,13 +5,22 @@ import java.util.regex.*;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-        String projectName = "{projectname}";
+        String projectName = getProjectName();
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
 
         List<String> endpoints = extractEndpoints(restDirectory);
         generateReadme(projectName, description, endpoints);
         System.out.println("README.md generated successfully!");
+    }
+
+    private static String getProjectName(){
+        // doesn't work, need to find better way to test
+        Path currentPath = Paths.get("").toAbsolutePath();
+        System.out.println(currentPath.toAbsolutePath());
+        Path projectRoot = currentPath.getParent();
+        System.out.println(projectRoot.toAbsolutePath());
+        return projectRoot.getFileName().toString();
     }
 
     private static List<String> extractEndpoints(String directory) throws IOException {
