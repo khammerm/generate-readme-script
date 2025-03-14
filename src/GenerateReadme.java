@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-//        String projectName = getAppName();
+        // String projectName = getAppName();
         String projectName = "test name";
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
@@ -25,7 +25,7 @@ public class GenerateReadme {
         // app name passed as var in pipeline
         String appName = System.getenv("APP_NAME");
         if (appName != null) {
-            return appName; // Remove the .jar extension if necessary
+            return appName;
         }
         // fall back if environment var not set
         Path currentPath = Paths.get("").toAbsolutePath();
@@ -35,12 +35,15 @@ public class GenerateReadme {
 
     private static List<String> extractEndpoints(String directory) throws IOException {
         List<String> endpoints = new ArrayList<>();
-//        Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
+        // Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
         Pattern pattern = Pattern.compile("@(GetMapping|PostMapping|PutMapping|DeleteMapping|RequestMapping)\\(\"(.*?)\"\\)", Pattern.DOTALL);
 
+        // Walk through given directory and find Rest Controller(s)
         Files.walk(Paths.get(directory))
                 .filter(Files::isRegularFile)
-                .filter(p -> p.toString().endsWith(".java"))
+                .filter(p -> p.toString().endsWith(".java") && (
+                        p.getFileName().toString().contains("RestController") ||
+                        p.getFileName().toString().contains("Controller")))
                 .forEach(path -> {
                     try {
                         String content = new String(Files.readAllBytes(path));
@@ -57,6 +60,7 @@ public class GenerateReadme {
     }
 
     private static void generateReadme(String projectName, String description, List<String> endpoints) throws IOException {
+        // build readme from given information
         StringBuilder readmeContent = new StringBuilder();
         readmeContent.append("# ").append(projectName).append("\n\n")
                 .append("## Description\n").append(description).append("\n\n")
@@ -71,3 +75,18 @@ public class GenerateReadme {
         }
     }
 }
+/*
+pipeline commands look something like this?
+stages:
+  - generate_readme
+
+generate_readme_job:
+  stage: generate_readme
+  image: openjdk:21  # Use the appropriate Java image
+  script:
+    - echo "Running README generation script..."
+    - javac GenerateReadme.java  # Compile the Java file
+    - java GenerateReadme  # Run the compiled Java program
+  only:
+    - master  # Adjust this based on when you want to run it (e.g., on merge requests or specific branches)
+ */
