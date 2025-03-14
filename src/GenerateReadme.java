@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-//        String projectName = getAppName();
-        String projectName = "test name";
+        String projectName = getAppName();
+//        String projectName = "test name";
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
 
@@ -50,7 +50,7 @@ public class GenerateReadme {
         // fall back if environment var not set
         Path currentPath = Paths.get("").toAbsolutePath();
         Path projectRoot = currentPath.getParent();
-        return projectRoot.getFileName().toString();
+        return currentPath.getFileName().toString();
     }
 
     private static List<String> extractEndpoints(String directory) throws IOException {
@@ -80,6 +80,10 @@ public class GenerateReadme {
     }
 
     private static void generateReadme(String projectName, String description, List<String> endpoints) throws IOException {
+        // Get the current working directory (repository root)
+        String currentDir = System.getProperty("user.dir");
+        Path readmePath = Paths.get(currentDir, "README.md");
+
         // build readme from given information
         StringBuilder readmeContent = new StringBuilder();
         readmeContent.append("# ").append(projectName).append("\n\n")
@@ -90,11 +94,12 @@ public class GenerateReadme {
             readmeContent.append("- `").append(endpoint).append("`\n");
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("README.md"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(readmePath.toFile()))) {
             writer.write(readmeContent.toString());
         }
     }
 }
+
 /*
 pipeline commands look something like this?
 stages:
@@ -102,11 +107,16 @@ stages:
 
 generate_readme_job:
   stage: generate_readme
-  image: openjdk:21  # Use the appropriate Java image
+  image: openjdk:21
   script:
     - echo "Running README generation script..."
-    - javac GenerateReadme.java  # Compile the Java file
-    - java GenerateReadme  # Run the compiled Java program
+    - javac GenerateReadme.java
+    - java GenerateReadme
+    - git config --global user.email "$GIT_USER_EMAIL"  # Set user email from environment variable
+    - git config --global user.name "$GIT_USER_NAME"    # Set user name from environment variable
+    - git add README.md
+    - git commit -m "Update README.md" || echo "No changes to commit"
+    - git push origin HEAD:master
   only:
-    - master  # Adjust this based on when you want to run it (e.g., on merge requests or specific branches)
+    - develop
  */

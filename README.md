@@ -1,7 +1,13 @@
 # generate-readme-script
 
-## Description:
-Script to auto generate a readme file for a RESTful Spring application
+## Description
+test desc
 
 ## Endpoints
-- no endpoints
+- `/tutorials`
+- `/tutorials/{id}`
+- `/tutorials`
+- `/tutorials/{id}`
+- `/tutorials/{id}`
+- `/tutorials`
+- `/tutorials/published`
