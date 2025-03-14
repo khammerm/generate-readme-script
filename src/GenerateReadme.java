@@ -5,7 +5,8 @@ import java.util.regex.*;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-        String projectName = getAppName();
+//        String projectName = getAppName();
+        String projectName = "test name";
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
 
@@ -20,7 +21,7 @@ public class GenerateReadme {
         if (appName != null) {
             return appName; // Remove the .jar extension if necessary
         }
-        // Fallback to the previous logic if environment variable is not set
+        // fall back if environment var not set
         Path currentPath = Paths.get("").toAbsolutePath();
         Path projectRoot = currentPath.getParent();
         return projectRoot.getFileName().toString();
@@ -28,16 +29,18 @@ public class GenerateReadme {
 
     private static List<String> extractEndpoints(String directory) throws IOException {
         List<String> endpoints = new ArrayList<>();
-        Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
+//        Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
+        Pattern pattern = Pattern.compile("@(GetMapping|PostMapping|PutMapping|DeleteMapping|RequestMapping)\\(\"(.*?)\"\\)", Pattern.DOTALL);
 
-
-        Files.walk(Paths.get(directory)).filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".java"))
+        Files.walk(Paths.get(directory))
+                .filter(Files::isRegularFile)
+                .filter(p -> p.toString().endsWith(".java"))
                 .forEach(path -> {
                     try {
                         String content = new String(Files.readAllBytes(path));
                         Matcher matcher = pattern.matcher(content);
                         while (matcher.find()) {
-                            endpoints.add(matcher.group(1));
+                            endpoints.add(matcher.group(2));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
