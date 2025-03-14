@@ -5,7 +5,7 @@ import java.util.regex.*;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-        String projectName = getProjectName();
+        String projectName = getAppName();
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
 
@@ -14,12 +14,15 @@ public class GenerateReadme {
         System.out.println("README.md generated successfully!");
     }
 
-    private static String getProjectName(){
-        // doesn't work, need to find better way to test
+    private static String getAppName() {
+        // app name passed as var in pipeline
+        String appName = System.getenv("APP_NAME");
+        if (appName != null) {
+            return appName; // Remove the .jar extension if necessary
+        }
+        // Fallback to the previous logic if environment variable is not set
         Path currentPath = Paths.get("").toAbsolutePath();
-        System.out.println(currentPath.toAbsolutePath());
         Path projectRoot = currentPath.getParent();
-        System.out.println(projectRoot.toAbsolutePath());
         return projectRoot.getFileName().toString();
     }
 
