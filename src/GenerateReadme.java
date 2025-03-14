@@ -11,14 +11,34 @@ import java.util.regex.Pattern;
 
 public class GenerateReadme {
     public static void main(String[] args) throws IOException {
-        // String projectName = getAppName();
+//        String projectName = getAppName();
         String projectName = "test name";
         String description = "test desc";
         String restDirectory = "C:\\Projects\\spring-boot-3-rest-api-example\\src\\main\\java\\com\\bezkoder\\spring\\restapi\\controller";
 
+        // look at file structure for multiple repos and see if this is needed
+//        String testDir = findRestDirectory(projectName, restDirectory);
+//        String basePath = "src/main/java/";
         List<String> endpoints = extractEndpoints(restDirectory);
         generateReadme(projectName, description, endpoints);
         System.out.println("README.md generated successfully!");
+    }
+
+    private static String findRestDirectory(String basePath, String projectName) throws IOException {
+        Path searchPath = Paths.get(basePath);
+        List<Path> foundDirectories = new ArrayList<>();
+
+        // Walk through the base path to find directories containing "Controller"
+        // if we do this don't need to filter controllers below
+        Files.walk(searchPath)
+                .filter(Files::isDirectory)
+                .filter(dir -> dir.toString().contains(projectName) &&
+                        (dir.getFileName().toString().contains("Controller") ||
+                                dir.getFileName().toString().contains("RestController")))
+                .forEach(foundDirectories::add);
+
+        // Return the first found directory, or null if none found
+        return foundDirectories.isEmpty() ? null : foundDirectories.get(0).toString();
     }
 
     private static String getAppName() {
@@ -35,7 +55,7 @@ public class GenerateReadme {
 
     private static List<String> extractEndpoints(String directory) throws IOException {
         List<String> endpoints = new ArrayList<>();
-        // Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
+//        Pattern pattern = Pattern.compile("@RequestMapping\\(.*?value\\s*=\\s*\"(.*?)\"", Pattern.DOTALL);
         Pattern pattern = Pattern.compile("@(GetMapping|PostMapping|PutMapping|DeleteMapping|RequestMapping)\\(\"(.*?)\"\\)", Pattern.DOTALL);
 
         // Walk through given directory and find Rest Controller(s)
